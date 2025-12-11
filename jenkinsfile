@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         REGISTRY = "ghcr.io"
-        IMAGE = "KamBhagat2050/python-app"
+        IMAGE = "kambhagat2050/python-app"
         TAG = "latest"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
+                git branch: 'master',
                     url: 'https://github.com/KamBhagat2050/devops-class-repo.git'
             }
         }
@@ -26,7 +26,7 @@ pipeline {
         stage('Push to GHCR') {
             steps {
                 script {
-                    docker.withRegistry("https://${REGISTRY}", "docker-registry-credentials") {
+                    docker.withRegistry("https://${REGISTRY}", "140634400") {
                         dockerImage.push()
                     }
                 }
