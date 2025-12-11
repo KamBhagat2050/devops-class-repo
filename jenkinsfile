@@ -1,0 +1,47 @@
+pipeline {
+    agent any
+
+    environment {
+        REGISTRY = "ghcr.io"
+        IMAGE = "KamBhagat2050/python-app"
+        TAG = "latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/KamBhagat2050/devops-class-repo.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    dockerImage = docker.build("${REGISTRY}/${IMAGE}:${TAG}")
+                }
+            }
+        }
+
+        stage('Push to GHCR') {
+            steps {
+                script {
+                    docker.withRegistry("https://${REGISTRY}", "docker-registry-credentials") {
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy (Kubernetes Optional)') {
+            when {
+                expression { fileExists('deployment.yaml') }
+            }
+            steps {
+                sh """
+                kubectl set image deployment/python-app python-app=${REGISTRY}/${IMAGE}:${TAG} --namespace default
+                """
+            }
+        }
+    }
+}
